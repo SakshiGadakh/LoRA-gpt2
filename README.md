@@ -6,9 +6,6 @@ including dataset curation, hyperparameter tuning, a genuine train → eval →
 diagnose → fix iteration cycle, and a quantitative evaluation on a held-out
 validation set.
 
-**Live demo:** https://huggingface.co/spaces/Sakshi12323/lora-support-chatbot-demo
-**Adapter weights:** https://huggingface.co/Sakshi12323/lora-support-chatbot-gpt2
-
 ## Why this project
 
 Fine-tuning APIs like [Tinker](https://tinker-docs.thinkingmachines.ai/) abstract
@@ -162,28 +159,16 @@ python3 test_model.py       # quick base vs. fine-tuned spot check (4 prompts)
 python3 evaluate.py         # full ROUGE + BERTScore evaluation on held-out set
 ```
 
-## Try the live demo
-
-A hosted Gradio demo comparing base GPT-2 vs. the LoRA fine-tuned model is
-available at:
-
-**https://huggingface.co/spaces/Sakshi12323/lora-support-chatbot-demo**
-
-Demo source code: `hf_space/app.py`
-
 ## File structure
 
 ```
 LoRA-gpt2/
-├── lora_real_model/
-│   ├── dataset.py           # 82 customer-support Q&A pairs
-│   ├── split_dataset.py     # 70/12 train/validation split (fixed seed)
-│   ├── prepare_data.py      # tokenization + loss masking (-100 labels), train set only
-│   ├── train_lora.py        # peft LoraConfig + Hugging Face Trainer
-│   ├── test_model.py        # base vs. fine-tuned quick spot check
-│   ├── evaluate.py          # ROUGE + BERTScore evaluation on held-out validation set
-│   └── lora_adapter/        # saved LoRA adapter weights (output, gitignored)
-└── hf_space/
-    ├── app.py                # Gradio demo app (deployed to Hugging Face Spaces)
-    └── requirements.txt
+└── lora_real_model/
+    ├── dataset.py           # 82 customer-support Q&A pairs
+    ├── split_dataset.py     # 70/12 train/validation split (fixed seed)
+    ├── prepare_data.py      # tokenization + loss masking (-100 labels), train set only
+    ├── train_lora.py        # peft LoraConfig + Hugging Face Trainer
+    ├── test_model.py        # base vs. fine-tuned quick spot check
+    ├── evaluate.py          # ROUGE + BERTScore evaluation on held-out validation set
+    └── lora_adapter/        # saved LoRA adapter weights (output, gitignored)
 ```
