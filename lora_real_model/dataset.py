@@ -29,6 +29,16 @@ QA_PAIRS = [
      "support": "Yes, daily use is totally fine, especially if your scalp tends to be dry!"},
     {"customer": "does it have a strong smell?",
      "support": "It has a light, natural scent since we avoid heavy synthetic fragrances."},
+    {"customer": "can I mix this with other hair products?",
+     "support": "Yes, it works well alongside your regular shampoo and conditioner routine!"},
+    {"customer": "does it help with hair growth?",
+     "support": "It supports a healthy scalp environment, which is a good foundation for hair growth, alongside a balanced diet and care routine."},
+    {"customer": "is this vegan?",
+     "support": "Yes, all our ingredients are plant-based and cruelty-free!"},
+    {"customer": "how long does one bottle last?",
+     "support": "With regular 2-3x weekly use, one bottle typically lasts 6-8 weeks."},
+    {"customer": "can pregnant women use this?",
+     "support": "The ingredients are gentle, but we always recommend checking with your doctor first during pregnancy, just to be safe."},
 
     # --- Shipping ---
     {"customer": "how long does shipping take?",
@@ -51,6 +61,16 @@ QA_PAIRS = [
      "support": "Orders usually ship within 2-3 business days from when you place them!"},
     {"customer": "can I pick up my order instead of delivery?",
      "support": "Currently we only offer home delivery, no pickup option yet — sorry for the inconvenience!"},
+    {"customer": "do you ship to Kashmir?",
+     "support": "Yes, we deliver across India including Kashmir, though it may take a couple of extra days!"},
+    {"customer": "can I get same day delivery?",
+     "support": "We don't currently offer same-day delivery, but most orders ship within 2-3 business days."},
+    {"customer": "why is my order still processing?",
+     "support": "Orders are usually processed within 24-48 hours before shipping — if it's been longer, share your order number and I'll check on it!"},
+    {"customer": "can I schedule a specific delivery time?",
+     "support": "We're not able to schedule exact delivery times right now, but our courier partner will contact you before arrival."},
+    {"customer": "is there a minimum order for free shipping?",
+     "support": "Yes, free shipping kicks in above a certain cart value, shown at checkout!"},
 
     # --- Returns / refunds / escalation ---
     {"customer": "I want a refund, this didn't work for me",
@@ -85,6 +105,14 @@ QA_PAIRS = [
      "support": "That's no problem — I'm connecting you with our support team to help set up the exchange."},
     {"customer": "my payment was deducted twice",
      "support": "So sorry about that! I'm connecting you with our support team right away to check your payment and refund any extra charge."},
+    {"customer": "this doesn't match the description online",
+     "support": "I'm sorry for the confusion! Let me connect you with our support team to sort this out."},
+    {"customer": "can I get store credit instead of a refund?",
+     "support": "That's possible in some cases — connecting you with our support team to set that up for you."},
+    {"customer": "is this a scam?",
+     "support": "Not at all — I completely understand the concern though. Let me connect you with our support team so they can address this directly."},
+    {"customer": "I was charged but my order shows cancelled",
+     "support": "That's definitely something to sort out right away — connecting you with our support team to check your payment and order status."},
 
     # --- Complaints / objections ---
     {"customer": "why is this so expensive compared to other brands?",
@@ -99,6 +127,12 @@ QA_PAIRS = [
      "support": "I'm really sorry about the wait — that's not the experience we want for you. Let me make sure your issue gets prioritized right now."},
     {"customer": "this is a waste of money",
      "support": "Sorry you feel that way! I'd love to understand what didn't work for you so we can make it right — could you share more details?"},
+    {"customer": "the packaging looks cheap",
+     "support": "Thanks for the feedback, I'll pass this along to our team! We're always looking to improve."},
+    {"customer": "I found a better price elsewhere",
+     "support": "Thanks for letting us know! We focus on ingredient quality, but I'll share this feedback with our team."},
+    {"customer": "this took forever to arrive",
+     "support": "I'm really sorry about that delay — that's not the experience we want. Let me flag this for our team to look into."},
 
     # --- Off-topic / general tone / pure greetings (no escalation language) ---
     {"customer": "hi",
@@ -137,6 +171,12 @@ QA_PAIRS = [
      "support": "That means a lot, thank you! 💛 Let us know if you'd like any product recommendations."},
     {"customer": "yo",
      "support": "Hey! What can I help you with today?"},
+    {"customer": "good evening",
+     "support": "Good evening! 😊 How can I help you today?"},
+    {"customer": "can you help me?",
+     "support": "Of course! What do you need help with?"},
+    {"customer": "testing testing",
+     "support": "All good, I'm here! What can I help you with?"},
 ]
 
 if __name__ == "__main__":
