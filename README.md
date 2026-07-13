@@ -1,59 +1,31 @@
-# LoRA Fine-Tuning: From Scratch to a Real Model
+# LoRA Fine-Tuning: GPT-2 Customer Support Chatbot
 
-A two-part project exploring Low-Rank Adaptation (LoRA) — first implemented from
-scratch on a custom tiny transformer, then applied to a real pretrained LLM
-(GPT-2) using Hugging Face's `peft` library, to build a customer-support chatbot
-for a hair-care/skincare brand. Includes a full curate → train → evaluate cycle
-with quantitative metrics on a held-out validation set.
+Fine-tuning **GPT-2 (124M params)** with **LoRA** (via Hugging Face's `peft`
+library) to build a customer-support chatbot for a hair-care/skincare brand —
+including dataset curation, hyperparameter tuning, a genuine train → eval →
+diagnose → fix iteration cycle, and a quantitative evaluation on a held-out
+validation set.
+
+**Live demo:** https://huggingface.co/spaces/Sakshi12323/lora-support-chatbot-demo
+**Adapter weights:** https://huggingface.co/Sakshi12323/lora-support-chatbot-gpt2
 
 ## Why this project
 
 Fine-tuning APIs like [Tinker](https://tinker-docs.thinkingmachines.ai/) abstract
-LoRA away behind a single config parameter (`rank=16`). This project builds the
-mechanism by hand first, to understand *why* it works and what's actually
-happening under the hood, before using the production-grade version on a real
-model, a real use case, and a rigorous evaluation methodology.
+LoRA away behind a single config parameter (`rank=16`). This project applies
+LoRA to a real pretrained model with a real use case, following a rigorous
+methodology end to end: curate data, tune hyperparameters, train, and evaluate
+quantitatively — rather than just running a fine-tuning script once and
+calling it done.
 
 ---
 
-## Part 1 — LoRA from scratch
-
-**Files:** `lora_from_scratch/lora.py`, `lora_from_scratch/tiny_gpt.py`, `lora_from_scratch/train_demo.py`
-
-Built a decoder-only transformer (`TinyGPT`) entirely from scratch in PyTorch —
-causal self-attention, multi-head splitting, MLP blocks, residual connections —
-and a hand-written `LoRALinear` layer that:
-
-- Freezes the original weight (`requires_grad=False`)
-- Adds two small trainable matrices, `A` (random init) and `B` (zero init)
-- Computes the forward pass as **two small matmuls through a rank-`r`
-  bottleneck** (`x @ A^T @ B^T`), never materializing the full-size `B @ A`
-  matrix during training
-- Includes a `merge()` method to fold the adapter into a plain `nn.Linear`
-  for zero-overhead inference
-
-### Result: full fine-tune vs. LoRA on a toy task
-
-| | Trainable params | Final loss |
-|---|---|---|
-| Full fine-tune | 162,240 (100%) | 0.690 |
-| LoRA (r=4) | 26,880 (15.27%) | **0.202** |
-
-LoRA matched — and in this small-task regime, beat — full fine-tuning while
-training **6x fewer parameters**, confirming the exact tradeoff described in
-Tinker's LoRA documentation (RL and small-data SL are where LoRA matches full
-fine-tuning). The merge sanity check confirmed correctness: max output
-difference after merging was `0.00000691` (float-precision noise, not a bug).
-
----
-
-## Part 2 — Real model, real task: GPT-2 + `peft`
+## The project
 
 **Files:** `lora_real_model/dataset.py`, `lora_real_model/split_dataset.py`, `lora_real_model/prepare_data.py`, `lora_real_model/train_lora.py`, `lora_real_model/test_model.py`, `lora_real_model/evaluate.py`
 
-Applied LoRA to a real pretrained model — **GPT-2 (124M params)** — to build a
-customer-support chatbot for a generic hair-care/skincare brand, using Hugging
-Face's `peft` library instead of hand-written code.
+Applied LoRA to **GPT-2 (124M params)** to build a customer-support chatbot for
+a generic hair-care/skincare brand, using Hugging Face's `peft` library.
 
 ### 1. Dataset curation
 
@@ -139,25 +111,22 @@ limitation of this evaluation, not just of the model.
 
 ## Key learnings
 
-1. **LoRA's cost saving comes from never materializing the full-size update
-   matrix** during training — only two small matrices (`A`, `B`) ever exist,
-   multiplied sequentially through a narrow bottleneck of size `r`.
-2. **Targeting only attention layers isn't enough** for tasks requiring content
+1. **Targeting only attention layers isn't enough** for tasks requiring content
    change (not just tone) — adding MLP layers (`c_fc`, `c_proj`) was necessary
-   to fix the "hi" greeting failure.
-3. **Fixing one category can break another.** Tripling refund/escalation
+   to fix a "hi" greeting failure where the model ignored training entirely.
+2. **Fixing one category can break another.** Tripling refund/escalation
    examples fixed refunds but caused escalation language to bleed into
    greetings — a direct, hands-on lesson in category balance and the
    importance of evaluating *each* category, not just overall loss.
-4. **Loss plateauing (~1.6-1.8) is expected and healthy**, not a failure —
+3. **Loss plateauing (~1.6-1.8) is expected and healthy**, not a failure —
    with diverse examples across 5 categories, a small-rank adapter, and a
    decaying learning rate, the loss floor reflects genuine task diversity
    rather than an undertrained model. Driving it to near-zero would likely
    indicate overfitting/memorization instead.
-5. **Loss curves alone don't tell you if fine-tuning worked** — the "hi"
-   failure in v1 wasn't visible from the loss number, only from actually
-   generating outputs and checking against a rubric per category.
-6. **Word-overlap and embedding-similarity metrics can both be fooled by
+4. **Loss curves alone don't tell you if fine-tuning worked** — a greeting
+   failure in an early version wasn't visible from the loss number, only from
+   actually generating outputs and checking against a rubric per category.
+5. **Word-overlap and embedding-similarity metrics can both be fooled by
    fluent, confidently wrong answers.** A model can score well on ROUGE and
    BERTScore while stating something factually backwards — quantitative NLP
    metrics measure similarity to a reference, not truthfulness, and should be
@@ -184,12 +153,7 @@ limitation of this evaluation, not just of the model.
 ```bash
 pip3 install torch transformers peft datasets accelerate rouge-score bert-score
 
-# Part 1: from-scratch LoRA demo
-cd lora_from_scratch
-python3 train_demo.py
-
-# Part 2: real GPT-2 + peft fine-tuning
-cd ../lora_real_model
+cd lora_real_model
 python3 dataset.py          # verify full dataset loads (82 examples)
 python3 split_dataset.py    # view the 70/12 train/validation split
 python3 prepare_data.py     # verify tokenization + loss masking (train set only)
@@ -198,20 +162,28 @@ python3 test_model.py       # quick base vs. fine-tuned spot check (4 prompts)
 python3 evaluate.py         # full ROUGE + BERTScore evaluation on held-out set
 ```
 
+## Try the live demo
+
+A hosted Gradio demo comparing base GPT-2 vs. the LoRA fine-tuned model is
+available at:
+
+**https://huggingface.co/spaces/Sakshi12323/lora-support-chatbot-demo**
+
+Demo source code: `hf_space/app.py`
+
 ## File structure
 
 ```
 LoRA-gpt2/
-├── lora_from_scratch/
-│   ├── lora.py            # hand-written LoRALinear + inject_lora()
-│   ├── tiny_gpt.py         # from-scratch decoder-only transformer
-│   └── train_demo.py       # full fine-tune vs. LoRA comparison + merge check
-└── lora_real_model/
-    ├── dataset.py           # 82 customer-support Q&A pairs
-    ├── split_dataset.py     # 70/12 train/validation split (fixed seed)
-    ├── prepare_data.py      # tokenization + loss masking (-100 labels), train set only
-    ├── train_lora.py        # peft LoraConfig + Hugging Face Trainer
-    ├── test_model.py        # base vs. fine-tuned quick spot check
-    ├── evaluate.py           # ROUGE + BERTScore evaluation on held-out validation set
-    └── lora_adapter/         # saved LoRA adapter weights (output, gitignored)
+├── lora_real_model/
+│   ├── dataset.py           # 82 customer-support Q&A pairs
+│   ├── split_dataset.py     # 70/12 train/validation split (fixed seed)
+│   ├── prepare_data.py      # tokenization + loss masking (-100 labels), train set only
+│   ├── train_lora.py        # peft LoraConfig + Hugging Face Trainer
+│   ├── test_model.py        # base vs. fine-tuned quick spot check
+│   ├── evaluate.py          # ROUGE + BERTScore evaluation on held-out validation set
+│   └── lora_adapter/        # saved LoRA adapter weights (output, gitignored)
+└── hf_space/
+    ├── app.py                # Gradio demo app (deployed to Hugging Face Spaces)
+    └── requirements.txt
 ```
